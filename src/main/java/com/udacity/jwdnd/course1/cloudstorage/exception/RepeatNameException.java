@@ -1,13 +1,9 @@
 package com.udacity.jwdnd.course1.cloudstorage.exception;
 
-public class RepeatNameException extends IllegalArgumentException{
-    private String exceptionCode;
-    private String exceptionMessage;
+public class RepeatNameException extends BaseException{
 
-    public RepeatNameException(String exceptionCode, String exceptionMessage) {
-        super(exceptionMessage);
-        this.exceptionCode = exceptionCode;
-        this.exceptionMessage = exceptionMessage;
+    public RepeatNameException() {
+        super("0001", "File name already existed, please upload file with other names");
     }
 
 }

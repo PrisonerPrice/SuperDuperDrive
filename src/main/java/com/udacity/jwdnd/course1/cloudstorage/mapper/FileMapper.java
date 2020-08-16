@@ -14,8 +14,8 @@ public interface FileMapper {
     int insert(File file);
 
     // download
-    @Select("SELECT * FROM FILES WHERE filename = #{fileName}")
-    File getFile(String fileName);
+    @Select("SELECT * FROM FILES WHERE fileid = #{fileId}")
+    File getFileById(int fileId);
     @Select("SELECT * FROM FILES")
     List<File> getFiles();
 

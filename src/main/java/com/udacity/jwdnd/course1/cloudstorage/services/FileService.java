@@ -1,5 +1,6 @@
 package com.udacity.jwdnd.course1.cloudstorage.services;
 
+import com.udacity.jwdnd.course1.cloudstorage.exception.FileNotFoundException;
 import com.udacity.jwdnd.course1.cloudstorage.exception.RepeatNameException;
 import com.udacity.jwdnd.course1.cloudstorage.mapper.FileMapper;
 import com.udacity.jwdnd.course1.cloudstorage.model.File;
@@ -26,23 +27,28 @@ public class FileService {
             byte[] fileData = multipartFile.getBytes();
             File newFile = new File(null, fileName, contentType, fileSize, fileData, userId);
             if (fileMapper.findFileByName(newFile.getFileName()) != null) {
-                throw new RepeatNameException("0001", "File name already existed, please upload file with other names");
+                throw new RepeatNameException();
             }
             int returnValue = fileMapper.insert(newFile);
-            return returnValue + " file uploaded successfully!";
+            return returnValue + " file is uploaded";
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return "0 file uploaded successfully!";
+        return "0 file is uploaded";
     }
 
     // download file
     public File downloadFile(int fileId) {
-        return null;
+        File file = fileMapper.getFileById(fileId);
+        if (file == null) {
+            throw new FileNotFoundException();
+        }
+        return file;
     }
 
     // delete file
     private String deleteFIle(int fileId) {
-        return null;
+        int deletedNumberOfFiles = fileMapper.deleteFile(fileId);
+        return deletedNumberOfFiles + " file is deleted";
     }
 }

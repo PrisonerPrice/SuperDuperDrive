@@ -18,8 +18,8 @@ public interface NoteMapper {
     int update(Note note);
 
     // get note
-    @Select("SELECT * FROM NOTES WHERE notetitle = #{noteTitle}")
-    Note getNote(String noteTitle);
+    @Select("SELECT * FROM NOTES WHERE noteid = #{noteId}")
+    Note getNoteById(int noteId);
     @Select("SELECT * FROM NOTES")
     List<Note> getNotes();
 
