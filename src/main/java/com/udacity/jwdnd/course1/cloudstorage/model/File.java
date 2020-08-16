@@ -7,13 +7,15 @@ public class File {
     private String contentType;
     private String fileSize;
     private byte[] fileDate;
+    private Integer userId;
 
-    public File(Integer fileId, String fileName, String contentType, String fileSize, byte[] fileDate) {
+    public File(Integer fileId, String fileName, String contentType, String fileSize, byte[] fileDate, Integer userId) {
         this.fileId = fileId;
         this.fileName = fileName;
         this.contentType = contentType;
         this.fileSize = fileSize;
         this.fileDate = fileDate;
+        this.userId = userId;
     }
 
     public Integer getFileId() {
@@ -54,5 +56,13 @@ public class File {
 
     public void setFileDate(byte[] fileDate) {
         this.fileDate = fileDate;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 }
