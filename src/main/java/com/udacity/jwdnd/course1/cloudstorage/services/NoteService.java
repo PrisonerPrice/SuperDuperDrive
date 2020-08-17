@@ -6,16 +6,23 @@ import com.udacity.jwdnd.course1.cloudstorage.model.Note;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class NoteService {
 
     @Autowired
     private NoteMapper noteMapper;
 
+    // get all notes
+    public List<Note> getAllNotes() {
+        return noteMapper.getAllNotes();
+    }
+
     // add note
     public String saveNote(Note note) {
-        int savedNumberOfNote = noteMapper.insert(note);
-        return savedNumberOfNote + " note is saved";
+        int numberOfSavedNote = noteMapper.insert(note);
+        return numberOfSavedNote + " note saved";
     }
 
     // get note
@@ -28,14 +35,17 @@ public class NoteService {
     }
 
     // update note
-    public String updateNoteById(Note note) {
-        int updatedNumberOfNote = noteMapper.update(note);
-        return updatedNumberOfNote + " note is updated";
+    public Note updateNoteById(Note note) {
+        if (note.getNoteId() == null) {
+            throw new NoteNotFoundException();
+        }
+        noteMapper.update(note);
+        return noteMapper.getNoteById(note.getNoteId());
     }
 
     // delete note
     public String deleteNoteById(int noteId) {
-        int deletedNumberOfNote = noteMapper.deleteNote(noteId);
-        return deletedNumberOfNote + " note is deleted";
+        int numberOfDeletedNote = noteMapper.deleteNote(noteId);
+        return numberOfDeletedNote + " note deleted";
     }
 }

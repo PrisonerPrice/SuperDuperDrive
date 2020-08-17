@@ -16,8 +16,6 @@ public interface FileMapper {
     // download
     @Select("SELECT * FROM FILES WHERE fileid = #{fileId}")
     File getFileById(int fileId);
-    @Select("SELECT * FROM FILES")
-    List<File> getFiles();
 
     // remove
     @Delete("DELETE * FROM FILES WHERE fileid = #{fileId}")
@@ -26,4 +24,8 @@ public interface FileMapper {
     // getFileByName
     @Select("SELECT * FROM FILES WHERE filename = #{fileName}")
     File findFileByName(String fileName);
+
+    // get all files
+    @Select("SELECT * FROM FILES")
+    List<File> getAllFiles();
 }

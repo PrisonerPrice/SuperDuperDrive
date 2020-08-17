@@ -10,12 +10,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class FileService {
 
     @Autowired
     private FileMapper fileMapper;
+
+    // get all files
+    public List<File> getAllFiles() {
+        return fileMapper.getAllFiles();
+    }
 
     // upload file
     public String uploadFile(MultipartFile multipartFile, User currUser) {
@@ -29,12 +35,12 @@ public class FileService {
             if (fileMapper.findFileByName(newFile.getFileName()) != null) {
                 throw new RepeatNameException();
             }
-            int returnValue = fileMapper.insert(newFile);
-            return returnValue + " file is uploaded";
+            int numberOfUploadedFile = fileMapper.insert(newFile);
+            return numberOfUploadedFile + " file uploaded";
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return "0 file is uploaded";
+        return "0 file uploaded";
     }
 
     // download file
@@ -47,8 +53,8 @@ public class FileService {
     }
 
     // delete file
-    private String deleteFIle(int fileId) {
-        int deletedNumberOfFiles = fileMapper.deleteFile(fileId);
-        return deletedNumberOfFiles + " file is deleted";
+    private String deleteFile(int fileId) {
+        int numberOfDeletedFile = fileMapper.deleteFile(fileId);
+        return numberOfDeletedFile + " file deleted";
     }
 }

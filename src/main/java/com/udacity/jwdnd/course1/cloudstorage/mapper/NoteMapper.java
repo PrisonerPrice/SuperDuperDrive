@@ -20,10 +20,12 @@ public interface NoteMapper {
     // get note
     @Select("SELECT * FROM NOTES WHERE noteid = #{noteId}")
     Note getNoteById(int noteId);
-    @Select("SELECT * FROM NOTES")
-    List<Note> getNotes();
 
     // remove note
     @Delete("DELETE * FROM NOTES WHERE noteid = #{noteId}")
     int deleteNote(int noteId);
+
+    // get all notes
+    @Select("SELECT * FROM NOTES")
+    List<Note> getAllNotes();
 }
