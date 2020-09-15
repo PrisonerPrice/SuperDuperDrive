@@ -4,12 +4,14 @@ import com.udacity.jwdnd.course1.cloudstorage.exception.CredentialAlreadyExisted
 import com.udacity.jwdnd.course1.cloudstorage.exception.CredentialNotFoundException;
 import com.udacity.jwdnd.course1.cloudstorage.mapper.CredentialMapper;
 import com.udacity.jwdnd.course1.cloudstorage.model.Credential;
+import com.udacity.jwdnd.course1.cloudstorage.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CredentialService {
@@ -21,8 +23,10 @@ public class CredentialService {
     private EncryptionService encryptionService;
 
     // get all credentials
-    public List<Credential> getAllCredentials() {
-        List<Credential> credentials = credentialMapper.getAllCredentials();
+    public List<Credential> getAllCredentials(User user) {
+        List<Credential> credentials = credentialMapper.getAllCredentials().stream()
+                .filter(credential -> credential.getUserId().equals(user.getUserId()))
+                .collect(Collectors.toList());
         for (Credential credential : credentials) {
             String decryptedPassword = encryptionService.decryptValue(credential.getPassword(), credential.getKey());
             credential.setPassword(decryptedPassword);
