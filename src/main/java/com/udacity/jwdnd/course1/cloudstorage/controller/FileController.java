@@ -3,6 +3,7 @@ package com.udacity.jwdnd.course1.cloudstorage.controller;
 import com.udacity.jwdnd.course1.cloudstorage.model.User;
 import com.udacity.jwdnd.course1.cloudstorage.services.FileService;
 
+import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,8 +31,14 @@ public class FileController {
     @Autowired
     private FileService fileService;
 
+    @Autowired
+    private UserService userService;
+
     @GetMapping("/all")
-    public ResponseEntity<List<Resource>> getAllFiles(User user, Authentication authentication) {
+    public ResponseEntity<List<Resource>> getAllFiles() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = (String) authentication.getPrincipal();
+        User user = userService.getUser(userName);
         if (authentication.isAuthenticated()) {
             List<Resource> filesResources = fileService.getAllFiles(user).stream().map(file -> new ByteArrayResource(file.getFileData())).collect(Collectors.toList());
             //body(new ByteArrayResource(dbFile.getData()));
@@ -44,7 +52,10 @@ public class FileController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<String> uploadFile(MultipartFile file, Authentication authentication, User user) {
+    public ResponseEntity<String> uploadFile(MultipartFile file) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = (String) authentication.getPrincipal();
+        User user = userService.getUser(userName);
         if (authentication.isAuthenticated()) {
             return ResponseEntity.ok().body(fileService.uploadFile(file, user));
         } else {
@@ -53,7 +64,8 @@ public class FileController {
     }
     
     @DeleteMapping("/")
-    public ResponseEntity<String> deleteFile(int fileId, Authentication authentication) {
+    public ResponseEntity<String> deleteFile(int fileId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.isAuthenticated()) {
             return ResponseEntity.ok().body(fileService.deleteFile(fileId));
         } else {
