@@ -1,5 +1,8 @@
 package com.udacity.jwdnd.course1.cloudstorage.model;
 
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+
+@EntityScan
 public class User {
     private Integer userId;
     private String userName;

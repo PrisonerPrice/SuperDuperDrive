@@ -23,9 +23,12 @@ public class NoteService {
     }
 
     // add note
-    public String saveNote(Note note) {
-        int numberOfSavedNote = noteMapper.insert(note);
-        return numberOfSavedNote + " note saved";
+    public void saveNote(String title, String description, Integer userId) {
+        Note note = new Note();
+        note.setNoteTitle(title);
+        note.setNoteDescription(description);
+        note.setUserId(userId);
+        noteMapper.insert(note);
     }
 
     // get note
@@ -38,12 +41,15 @@ public class NoteService {
     }
 
     // update note
-    public Note updateNoteById(Note note) {
-        if (note.getNoteId() == null) {
+    public Note updateNoteById(Integer noteId, String title, String description) {
+        Note noteToBeUpdated = noteMapper.getNoteById(noteId);
+        if (noteToBeUpdated == null ) {
             throw new NoteNotFoundException();
         }
-        noteMapper.update(note);
-        return noteMapper.getNoteById(note.getNoteId());
+        noteToBeUpdated.setNoteTitle(title);
+        noteToBeUpdated.setNoteDescription(description);
+        noteMapper.update(noteToBeUpdated);
+        return noteToBeUpdated;
     }
 
     // delete note

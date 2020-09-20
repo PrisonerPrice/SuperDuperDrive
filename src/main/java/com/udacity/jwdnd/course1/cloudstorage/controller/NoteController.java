@@ -1,90 +1,87 @@
 package com.udacity.jwdnd.course1.cloudstorage.controller;
 
+import com.udacity.jwdnd.course1.cloudstorage.model.Note;
 import com.udacity.jwdnd.course1.cloudstorage.model.User;
-import com.udacity.jwdnd.course1.cloudstorage.services.FileService;
-
+import com.udacity.jwdnd.course1.cloudstorage.services.NoteService;
 import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
-import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping(value = {"/file"})
-public class FileController {
+@RequestMapping(value = {"/note"})
+public class NoteController {
 
     @Autowired
-    private FileService fileService;
+    private NoteService noteService;
 
     @Autowired
     private UserService userService;
 
-    @GetMapping("/all")
-    public ResponseEntity<List<Resource>> getAllFiles() {
+    @PostMapping("/")
+    public ResponseEntity<String> createNewNote(@RequestParam String title, @RequestParam String description) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = (String) authentication.getPrincipal();
         User user = userService.getUser(userName);
         if (authentication.isAuthenticated()) {
-            List<Resource> filesResources = fileService.getAllFiles(user).stream().map(file -> new ByteArrayResource(file.getFileData())).collect(Collectors.toList());
-            //body(new ByteArrayResource(dbFile.getData()));
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType("file"))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachments")
-                    .body(filesResources);
+            noteService.saveNote(title, description, user.getUserId());
+            return new ResponseEntity<>("Save note successfully", HttpStatus.OK);
+        } else {
+            return ResponseEntity.badRequest().body("Not authenticated");
+        }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Note>> getAllNotes() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = (String) authentication.getPrincipal();
+        User user = userService.getUser(userName);
+        if (authentication.isAuthenticated()) {
+            return ResponseEntity.ok().body(noteService.getAllNotes(user));
         } else {
             return ResponseEntity.badRequest().body(new ArrayList<>());
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Resource> getFileById(@PathVariable("id") int fileId) {
+    public ResponseEntity<Note> getNoteById(@RequestParam("id") int noteId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = (String) authentication.getPrincipal();
         User user = userService.getUser(userName);
         if (authentication.isAuthenticated()) {
-            Resource filesResource = new ByteArrayResource(fileService.downloadFile(fileId).getFileData());
-            //body(new ByteArrayResource(dbFile.getData()));
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType("file"))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachments")
-                    .body(filesResource);
+            return ResponseEntity.ok().body(noteService.getNoteById(noteId));
         } else {
             return ResponseEntity.badRequest().body(null);
         }
     }
 
-    @PostMapping("/")
-    public ResponseEntity<String> uploadFile(MultipartFile file) {
+    @PutMapping("/{id}")
+    public ResponseEntity<Note> updateNoteById(@RequestParam("id") int noteId, @RequestParam String title, @RequestParam String description) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = (String) authentication.getPrincipal();
         User user = userService.getUser(userName);
         if (authentication.isAuthenticated()) {
-            return ResponseEntity.ok().body(fileService.uploadFile(file, user));
+            return ResponseEntity.ok().body(noteService.updateNoteById(noteId, title, description));
         } else {
-            return ResponseEntity.badRequest().body("Not authenticated");
-        }
-    }
-    
-    @DeleteMapping("/")
-    public ResponseEntity<String> deleteFile(int fileId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication.isAuthenticated()) {
-            return ResponseEntity.ok().body(fileService.deleteFile(fileId));
-        } else {
-            return ResponseEntity.badRequest().body("Not authenticated");
+            return ResponseEntity.badRequest().body(null);
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteNoteById(@RequestParam("id") int noteId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.isAuthenticated()) {
+            noteService.deleteNoteById(noteId);
+            return ResponseEntity.ok().body("Delete successfully");
+        } else {
+            return ResponseEntity.badRequest().body("Not authenticated");
+        }
+    }
 }

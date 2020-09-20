@@ -1,10 +1,16 @@
 package com.udacity.jwdnd.course1.cloudstorage.model;
 
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+
+@EntityScan
 public class Note {
     private Integer noteId;
     private String noteTitle;
     private String noteDescription;
     private Integer userId;
+
+    public Note() {
+    }
 
     public Note(Integer noteId, String noteTitle, String noteDescription, Integer userId) {
         this.noteId = noteId;
