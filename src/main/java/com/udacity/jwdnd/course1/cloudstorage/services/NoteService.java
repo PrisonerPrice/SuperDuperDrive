@@ -33,11 +33,7 @@ public class NoteService {
 
     // get note
     public Note getNoteById(int noteId) {
-        Note note = noteMapper.getNoteById(noteId);
-        if (note == null) {
-            throw new NoteNotFoundException();
-        }
-        return note;
+        return noteMapper.getNoteById(noteId);
     }
 
     // update note

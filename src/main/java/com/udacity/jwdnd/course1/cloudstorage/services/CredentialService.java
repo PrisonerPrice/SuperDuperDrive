@@ -34,33 +34,47 @@ public class CredentialService {
         return credentials;
     }
 
+    // get credential by id
+    public Credential getCredentialById(int credentialId) {
+        return credentialMapper.getCredentialById(credentialId);
+    }
+
     // save
-    public String saveCredential(Credential credential) {
-        if (credential.getCredentialId() != null) {
-            throw new CredentialAlreadyExistedException();
-        }
+    public String saveCredential(String url, String userName, String password, int userId) {
+        Credential credential = new Credential();
+        credential.setUrl(url);
+        credential.setUserName(userName);
+        credential.setPassword(password);
+        credential.setUserId(userId);
         SecureRandom random = new SecureRandom();
-        byte[] key = new byte[16];
-        random.nextBytes(key);
-        String encodedKey = Base64.getEncoder().encodeToString(key);
+        byte[] k = new byte[16];
+        random.nextBytes(k);
+        String encodedKey = Base64.getEncoder().encodeToString(k);
         String encryptedPassword = encryptionService.encryptValue(credential.getPassword(), encodedKey);
         credential.setKey(encodedKey);
         credential.setPassword(encryptedPassword);
-        int numberOfSavedCredential = credentialMapper.save(credential);
-        return numberOfSavedCredential + " credential saved";
+        credentialMapper.save(credential);
+        return "Credential saved successfully";
     }
 
     // edit
-    public Credential updateCredential(Credential credential) {
-        if (credential.getCredentialId() == null) {
+    public Credential updateCredentialById(int credentialId, String url, String userName, String password) {
+        if (credentialMapper.getCredentialById(credentialId) == null) {
             throw new CredentialNotFoundException();
         }
-        credentialMapper.update(credential);
-        return credentialMapper.getCredentialById(credential.getCredentialId());
+        Credential credentialToBeUpdated = credentialMapper.getCredentialById(credentialId);
+        credentialToBeUpdated.setUrl(url);
+        credentialToBeUpdated.setUserName(userName);
+        credentialToBeUpdated.setPassword(password);
+        String encodedKey = credentialToBeUpdated.getKey();
+        String encryptedPassword = encryptionService.encryptValue(credentialToBeUpdated.getPassword(), encodedKey);
+        credentialToBeUpdated.setPassword(encryptedPassword);
+        credentialMapper.update(credentialToBeUpdated);
+        return credentialToBeUpdated;
     }
 
     // remove
-    public String deleteCredential(int credentialId) {
+    public String deleteCredentialById(int credentialId) {
         int numberOfDeletedCredential = credentialMapper.delete(credentialId);
         return numberOfDeletedCredential + " credential deleted";
     }

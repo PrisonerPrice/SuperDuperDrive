@@ -53,8 +53,6 @@ public class NoteController {
     @GetMapping("/{id}")
     public ResponseEntity<Note> getNoteById(@RequestParam("id") int noteId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userName = (String) authentication.getPrincipal();
-        User user = userService.getUser(userName);
         if (authentication.isAuthenticated()) {
             return ResponseEntity.ok().body(noteService.getNoteById(noteId));
         } else {
@@ -65,8 +63,6 @@ public class NoteController {
     @PutMapping("/{id}")
     public ResponseEntity<Note> updateNoteById(@RequestParam("id") int noteId, @RequestParam String title, @RequestParam String description) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userName = (String) authentication.getPrincipal();
-        User user = userService.getUser(userName);
         if (authentication.isAuthenticated()) {
             return ResponseEntity.ok().body(noteService.updateNoteById(noteId, title, description));
         } else {
